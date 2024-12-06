@@ -1,0 +1,52 @@
+ONCE THE IAC SCRIPT IS FULLY EXECUTED: 
+(when deploying name the deplyment exp3-deployment)
+
+Kong Instance: 
+sudo usermod -aG docker $USER
+sudo reboot
+sudo nano kong.yml (fill the yml file with the one on this repository; changes IP's)
+sudo docker network create kong-net
+sudo docker run -d --name kong --network=kong-net \
+  -v /home/camix369/kong.yml:/kong/config/kong.yml \
+  -v "$(pwd):/kong/declarative/" \
+  -e "KONG_DATABASE=off" \
+  -e "KONG_DECLARATIVE_CONFIG=/kong/declarative/kong.yml" \
+  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
+  -e "KONG_ADMIN_GUI_URL=http://localhost:8002" \
+  -p 8000:8000 \
+  -p 8001:8001 \
+  -p 8002:8002 \
+  kong/kong-gateway:2.7.2.0-alpine
+docker ps (to check its running; port 8000)
+
+All other instances: 
+cd /labs/OfipensionesExp1/
+sudo nano ofipensiones/settings.py (change db info AND change public ip for auth0)
+sudo chown -R camix369 /labs/
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py runserver 0.0.0.0:8080
+
+CONNECT TO SQL DB GCP: 
+gcloud sql connect myinstance --user=postgres
+CREATE EXTENSION IF NOT EXISTS pgcrypto
+\dx (to check it was created)
+\dt (list all databases)
+SELECT * FROM public.facturas_factura; (toca especificar el schema)
+
+
+AUTH0 CONFIG: 
+Settings -> Advanced -> Allowed logout Urls -> http://ip_publica_instancia:8080 (para todas las instancias que esten corriendo)
+Aplications -> ofipensiones -> Allowed Callback URLs ->  http://ip_publica_instancia:8080/complete/auth0 (para todas las instancias que esten corriendo)
+Aplications -> ofipensiones -> Allowed Logout URLs -> http://ip_publica_instancia:8080 (para todas las instancias que esten corriendo)
+
+USUARIOS AUTH0
+ofiusuario1@gmail.com -> ofiusuario1* -> role: Administrador kids: []
+ofiusuario2@gmail.com -> ofiusuario2* -> role: Padre kids: [1]
+ofiusuario3@gmail.com -> ofiusuario3* -> role: Padre kids: [2,3]
+
+(estudiante con cronograma is not working)

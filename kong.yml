@@ -1,0 +1,101 @@
+_format_version: "2.1"
+
+services:
+  - host: facturas_upstream
+    name: facturas_service
+    protocol: http
+    routes:
+      
+      - name: facturas
+        paths:
+          - /facturas
+          - /facturacreate/
+        strip_path: false
+        preserve_host: true
+
+  - host: cronograma_upstream
+    name: cronograma_service
+    protocol: http
+    routes:
+      
+      - name: alarms
+        paths:
+          - /cronogramas
+          - /cronogramacreate/
+          - /estudiantes
+          - /estudiantes/aldia/
+          - /estudiantes/padre/
+          - /estudiantescreate/
+        strip_path: false
+        preserve_host: true
+
+  - host: login_upstream
+    name: login_service
+    protocol: http
+    routes:
+      
+      - name: login
+        paths:
+          - /
+          - /login/auth0
+          - /logout
+          - /complete/auth0
+        strip_path: false
+        preserve_host: true
+
+upstreams:
+  - name: facturas_upstream
+    targets:
+      - target: <ip-balanceador-facturas>:80
+        weight: 100
+
+  - name: login_upstream
+    targets:
+      - target: <ip-balanceador-facturas>:80
+        weight: 100
+
+  - name: cronograma_upstream
+    targets:
+      - target: <ip-balanceador-cronograma>:80
+        weight: 100
+
+plugins:
+  - name: rate-limiting
+    service: facturas_service
+    config:
+      minute: 100      
+      policy: local           
+      limit_by: ip            
+
+  - name: rate-limiting
+    service: cronograma_service
+    config:
+      minute: 100          
+      policy: local           
+      limit_by: ip
+
+  - name: rate-limiting
+    service: login_service
+    config:
+      minute: 100          
+      policy: local           
+      limit_by: ip
+
+#  - name: openid-connect 
+#    service: facturas_service 
+#    config: 
+#      issuer: "https://dev-q7i27cyhme62vzcv.us.auth0.com/" 
+#      client_id: "7qu1D6q8MsC52yQryJStuE3KSRwx3SzT" 
+#      client_secret: "dpGMZKtXHUk-covI_w-SBFueZkSkQWNJm07zl9zN25UjVVomnRTuhXsfIjJnU9Tw" 
+#      redirect_uri: "https://<your-kong-instance>/" 
+#      scopes: ["openid", "profile", "email"] 
+
+#  - name: openid-connect 
+#    service: cronograma_service 
+#    config: 
+#      issuer: "https://dev-q7i27cyhme62vzcv.us.auth0.com/" 
+#      client_id: "7qu1D6q8MsC52yQryJStuE3KSRwx3SzT" 
+#      client_secret: "dpGMZKtXHUk-covI_w-SBFueZkSkQWNJm07zl9zN25UjVVomnRTuhXsfIjJnU9Tw" 
+#      redirect_uri: "https://<your-kong-instance>/" 
+#      scopes: ["openid", "profile", "email"] 
+
