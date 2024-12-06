@@ -6,12 +6,12 @@ client = motor.motor_asyncio.AsyncIOMotorClient(
     "mongodb://monitoring_user:isis2503@10.128.0.70:27017"
 )
 db = client.get_database("monitoring_db")
-informes_collection = db.get_collection("informes")
+informe_collection = db.get_collection("informes")
 
 
 async def set_informes_db():
     # Creates a unique index on the code field
-    await informes_collection.create_index("code", unique=True)
+    await informe_collection.create_index("code", unique=True)
 
 
 # Represents an ObjectId field in the database.
