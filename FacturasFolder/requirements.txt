@@ -1,9 +1,0 @@
-Django
-psycopg2-binary
-djangorestframework
-django-pgcrypto-fields
-social-auth-app-django
-PyJWT
-cryptography
-python-dotenv
-pymongo
