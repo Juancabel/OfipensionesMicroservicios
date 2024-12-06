@@ -5,26 +5,20 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 from models.db import PyObjectId
 
-
-class InformeType(str, Enum):
-    Classroom = "classroom"
-    Laboratory = "laboratory"
-    Auditorium = "auditorium"
-    Office = "office"
-
-
 class Informe(BaseModel):
+    descripcion: str = Field(...)
+    al_dia: int = Field(...)
     code: str = Field(...)
-    capacity: int = Field(...)
-    type: InformeType = Field(...)
+    fecha: str = Field(...)
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         json_schema_extra={
             "example": {
-                "code": "ML515",
-                "capacity": 50,
-                "type": InformeType.Classroom,
+                "descripcion": "Este es un informe de prueba, en general todo esta bien",
+                "al_dia": 50,
+                "code": "INF01",
+                "fecha": "12/12/2022",
             }
         },
     )
@@ -36,10 +30,10 @@ class InformeOut(Informe):
         from_attributes=True,
         json_schema_extra={
             "example": {
-                "id": "64b9f1f4f1d2b2a3c4e5f6a7",
-                "code": "ML515",
-                "capacity": 50,
-                "type": InformeType.Classroom,
+                "descripcion": "Este es un informe de prueba, en general todo esta bien",
+                "al_dia": 50,
+                "code": "INF01",
+                "fecha": "12/12/2022",
             }
         },
     )
